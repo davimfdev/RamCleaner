@@ -48,7 +48,7 @@ Baseado no design system do davimf.dev (fundo quase preto quente, painéis com b
 
 - O número no Gerenciador de Tarefas cai muito (é a coluna **RAM (working set)**).
 - A coluna **Privada (commit)** quase não muda — é a memória que o app realmente reservou.
-- Quando o app volta a usar aquelas páginas, elas voltam (page faults). Em apps parados em segundo plano isso é imperceptível; em jogos ou apps em uso ativo causa travadinhas, igual você viu com o Firemin.
+- Quando o app volta a usar aquelas páginas, elas voltam (page faults). Em apps parados em segundo plano isso é imperceptível; em jogos ou apps em uso ativo causa travadinhas ou problemas de textura.
 - Intervalos muito curtos (100–1000 ms) em apps ativos costumam piorar: o app fica trazendo memória de volta o tempo todo. 30–60 s com limite por app é um bom começo; use intervalos curtos só em apps parados em segundo plano.
 
 Apps rodando como administrador ou serviços aparecem como "Sem permissão"; para esses, troque `asInvoker` por `requireAdministrator` no `app.manifest`.
