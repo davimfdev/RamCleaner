@@ -7,7 +7,7 @@ Limpador de memória estilo Firemin, só que para **vários apps ao mesmo tempo*
 Precisa do **.NET 8 SDK** (ou mais novo).
 
 ```powershell
-cd C:\Users\davi\Documents\Projetos\RamCleaner
+cd C:\Users\%USER%\Documents\Projetos\RamCleaner
 dotnet run                                   # testar
 dotnet publish -c Release -r win-x64         # gera um .exe único em bin\Release\net8.0-windows\win-x64\publish\
 ```
