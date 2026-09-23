@@ -1,0 +1,14 @@
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\win-x64\RamCleaner.exe
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\win-x64\RamCleaner.deps.json
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\win-x64\RamCleaner.runtimeconfig.json
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\win-x64\RamCleaner.dll
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\win-x64\RamCleaner.pdb
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\win-x64\RamCleaner.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\win-x64\RamCleaner.AssemblyInfoInputs.cache
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\win-x64\RamCleaner.AssemblyInfo.cs
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\win-x64\RamCleaner.csproj.CoreCompileInputs.cache
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\win-x64\RamCleaner.dll
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\win-x64\refint\RamCleaner.dll
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\win-x64\RamCleaner.pdb
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\win-x64\RamCleaner.genruntimeconfig.cache
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\win-x64\ref\RamCleaner.dll

@@ -1,0 +1,5 @@
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\win-x64\publish\RamCleaner.exe
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\win-x64\publish\RamCleaner.dll
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\win-x64\publish\RamCleaner.deps.json
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\win-x64\publish\RamCleaner.runtimeconfig.json
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\win-x64\publish\RamCleaner.pdb

@@ -1,0 +1,2 @@
+C:\Apps\RamCleaner\RamCleaner.pdb
+C:\Apps\RamCleaner\RamCleaner.exe
