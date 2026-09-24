@@ -3,7 +3,7 @@ using System.Drawing.Text;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
-namespace RamCleaner;
+namespace Lysma;
 
 /// <summary>
 /// Tokens visuais baseados no design system do davimf.dev (src/styles/tokens.css).

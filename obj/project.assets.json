@@ -80,11 +80,11 @@
     "C:\\Users\\davi\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "1.2.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\davi\\Documents\\Projetos\\RamCleaner\\RamCleaner.csproj",
-      "projectName": "RamCleaner",
-      "projectPath": "C:\\Users\\davi\\Documents\\Projetos\\RamCleaner\\RamCleaner.csproj",
+      "projectUniqueName": "C:\\Users\\davi\\Documents\\Projetos\\RamCleaner\\Lysma.csproj",
+      "projectName": "Lysma",
+      "projectPath": "C:\\Users\\davi\\Documents\\Projetos\\RamCleaner\\Lysma.csproj",
       "packagesPath": "C:\\Users\\davi\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\davi\\Documents\\Projetos\\RamCleaner\\obj\\",
       "projectStyle": "PackageReference",

@@ -1,6 +1,6 @@
 using System.Drawing.Text;
 
-namespace RamCleaner;
+namespace Lysma;
 
 internal class MainForm : Form
 {
@@ -8,7 +8,8 @@ internal class MainForm : Form
     /// <summary>Estatísticas por TargetApp.Id.</summary>
     private readonly Dictionary<string, AppStats> _stats = new();
 
-    private readonly DataGridView _grid = new();
+    private readonly ThemedGrid _grid = new();
+    private readonly ThinScrollBar _scroll = new();
     private readonly FieldBox _interval = new(suffix: "ms", numeric: true);
     private readonly ToggleSwitch _startup = new() { Text = "Iniciar com o Windows" };
     private readonly ToggleSwitch _startMin = new() { Text = "Abrir minimizado na bandeja" };
@@ -39,15 +40,14 @@ internal class MainForm : Form
         _cfg = cfg;
         _startHidden = startHidden;
 
-        Text = "RamCleaner";
+        Text = "Lysma";
         Size = new Size(1140, 680);
         MinimumSize = new Size(920, 520);
         StartPosition = FormStartPosition.CenterScreen;
         Font = Theme.Sans(9f);
         BackColor = Theme.Bg;
         ForeColor = Theme.Fg;
-        try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application; }
-        catch { Icon = SystemIcons.Application; }
+        Icon = AppIcon.Window;
 
         BuildLayout();
         BuildTray();
@@ -105,8 +105,8 @@ internal class MainForm : Form
 
         header.Controls.Add(new HeaderBlock
         {
-            Eyebrow = "RamCleaner",
-            Title = "Limpeza de memória",
+            Eyebrow = "Lysma",
+            Title = "Estação de limpeza de memória",
             Subtitle = "Esvazia o working set dos apps escolhidos a cada intervalo. A memória volta sob demanda.",
             Dock = DockStyle.Fill
         }, 0, 0);
@@ -130,29 +130,20 @@ internal class MainForm : Form
 
     private Control BuildContent()
     {
-        var surface = new SurfacePanel { Dock = DockStyle.Fill, Padding = new Padding(16, 12, 16, 6), Margin = new Padding(0) };
+        var surface = new SurfacePanel { Dock = DockStyle.Fill, Padding = new Padding(16, 12, 10, 8), Margin = new Padding(0) };
 
-        // ---- barra de ferramentas
-        var bar = new TableLayoutPanel { Dock = DockStyle.Top, Height = 46, ColumnCount = 2, BackColor = Theme.Surface1 };
-        bar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        bar.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        // ---- barra de ferramentas (layout manual: tudo centralizado na vertical)
+        var bar = new ToolbarPanel { Dock = DockStyle.Top, Height = 46, BackColor = Theme.Surface1, Padding = new Padding(0, 0, 6, 0) };
 
-        var left = new FlowLayoutPanel { Dock = DockStyle.Fill, WrapContents = false, BackColor = Theme.Surface1, Margin = new Padding(0) };
         var add = new PillButton { Text = "+ Adicionar" };
         var edit = new PillButton { Text = "Editar" };
         var remove = new PillButton { Text = "Remover", Variant = PillButton.Kind.Danger };
         add.Click += (_, _) => AddApps();
         edit.Click += (_, _) => EditSelected();
         remove.Click += (_, _) => RemoveSelected();
-        left.Controls.AddRange(new Control[] { add, edit, remove });
+        bar.AddLeft(add, edit, remove);
 
-        var right = new FlowLayoutPanel
-        {
-            AutoSize = true, WrapContents = false, FlowDirection = FlowDirection.LeftToRight,
-            BackColor = Theme.Surface1, Margin = new Padding(0), Anchor = AnchorStyles.Right
-        };
         _interval.Width = 120;
-        _interval.Margin = new Padding(0, 0, 18, 0);
         _interval.Input.Text = _cfg.IntervalMs.ToString();
         _interval.Input.Leave += (_, _) => CommitInterval();
         _interval.Input.KeyDown += (_, e) =>
@@ -164,7 +155,6 @@ internal class MainForm : Form
         _tip.SetToolTip(_interval.Input, $"Mínimo {AppConfig.MinIntervalMs} ms. 500 = meio segundo, 30000 = 30 s.");
 
         _paused.Checked = _cfg.Paused;
-        _paused.Margin = new Padding(0, 3, 0, 0);
         _paused.CheckedChanged += (_, _) =>
         {
             _cfg.Paused = _paused.Checked;
@@ -172,28 +162,27 @@ internal class MainForm : Form
             UpdateTrayMenu();
             UpdateGridStats();
         };
-        right.Controls.AddRange(new Control[] { new EyebrowLabel("Intervalo"), _interval, _paused });
-
-        bar.Controls.Add(left, 0, 0);
-        bar.Controls.Add(right, 1, 0);
+        bar.AddRight(new EyebrowLabel("Intervalo"), _interval, _paused);
 
         var spacer = new Panel { Dock = DockStyle.Top, Height = 8, BackColor = Theme.Surface1 };
 
         BuildGrid();
+        _scroll.Dock = DockStyle.Right;
+        _scroll.Attach(_grid);
 
-        surface.Controls.Add(_grid);   // Fill (adicionado primeiro = fica por último no dock)
-        surface.Controls.Add(spacer);
-        surface.Controls.Add(bar);
+        // Ordem de dock: o último adicionado encaixa primeiro.
+        surface.Controls.Add(_grid);    // Fill
+        surface.Controls.Add(_scroll);  // Right
+        surface.Controls.Add(spacer);   // Top
+        surface.Controls.Add(bar);      // Top
         return surface;
     }
 
     private Control BuildFooter()
     {
-        var footer = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, Margin = new Padding(0, 10, 0, 0), BackColor = Theme.Bg };
-        footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        footer.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        // Layout manual (mesmo da barra de ferramentas): interruptores à esquerda, sair à direita.
+        var footer = new ToolbarPanel { Dock = DockStyle.Fill, Margin = new Padding(0, 10, 0, 0), BackColor = Theme.Bg, Gap = 18 };
 
-        var toggles = new FlowLayoutPanel { Dock = DockStyle.Fill, WrapContents = false, BackColor = Theme.Bg, Margin = new Padding(0) };
         _startup.Checked = _cfg.StartWithWindows;
         _startup.CheckedChanged += (_, _) =>
         {
@@ -204,20 +193,14 @@ internal class MainForm : Form
         };
         _startMin.Checked = _cfg.StartMinimized;
         _startMin.CheckedChanged += (_, _) => { _cfg.StartMinimized = _startMin.Checked; _cfg.Save(); };
-        toggles.Controls.AddRange(new Control[] { _startup, _startMin });
+        footer.AddLeft(_startup, _startMin);
 
-        var hint = new Label
-        {
-            Text = "Fechar no X mantém na bandeja",
-            AutoSize = true,
-            ForeColor = Theme.FgMuted,
-            Font = Theme.Sans(8.5f),
-            Anchor = AnchorStyles.Right,
-            Margin = new Padding(0, 6, 0, 0)
-        };
+        // O X só esconde na bandeja; este botão encerra de verdade.
+        var quit = new PillButton { Text = "Finalizar Lysma", Variant = PillButton.Kind.Danger, Height = 30 };
+        quit.Click += (_, _) => { _reallyExit = true; Close(); };
+        _tip.SetToolTip(quit, "Fecha o Lysma de vez. O X da janela só esconde na bandeja.");
 
-        footer.Controls.Add(toggles, 0, 0);
-        footer.Controls.Add(hint, 1, 0);
+        footer.AddRight(quit);
         return footer;
     }
 
@@ -317,8 +300,8 @@ internal class MainForm : Form
 
     private void BuildTray()
     {
-        _tray.Icon = Icon;
-        _tray.Text = "RamCleaner";
+        _tray.Icon = AppIcon.Tray;
+        _tray.Text = "Lysma";
         _tray.Visible = true;
         _tray.DoubleClick += (_, _) => ShowWindow();
         UpdateTrayMenu();
@@ -562,7 +545,7 @@ internal class MainForm : Form
             var infoCell = row.Cells[ColInfo];
             if (!Equals(infoCell.Tag, tone)) { infoCell.Tag = tone; _grid.InvalidateCell(infoCell); }
             Set(infoCell, info);
-            infoCell.ToolTipText = s.AccessDenied > 0 ? "Esse app roda como administrador. Rode o RamCleaner como admin para limpá-lo." : "";
+            infoCell.ToolTipText = s.AccessDenied > 0 ? "Esse app roda como administrador. Rode o Lysma como admin para limpá-lo." : "";
         }
         _loadingGrid = false;
 
@@ -578,7 +561,7 @@ internal class MainForm : Form
         _cardState.ValueColor = _cfg.Paused ? Theme.Warn : Theme.Ok;
         _cardState.Caption = _cfg.Paused ? "limpeza automática desligada" : $"limpando a cada {every}";
 
-        string tip = $"RamCleaner - {Trimmer.FormatMB(totalWs)} ({(_cfg.Paused ? "pausado" : "a cada " + every)})";
+        string tip = $"Lysma - {Trimmer.FormatMB(totalWs)} ({(_cfg.Paused ? "pausado" : "a cada " + every)})";
         _tray.Text = tip.Length > 63 ? tip[..63] : tip;
     }
 

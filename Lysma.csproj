@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>lysma.ico</ApplicationIcon>
+    <AssemblyName>Lysma</AssemblyName>
+    <RootNamespace>Lysma</RootNamespace>
+    <Product>Lysma</Product>
+    <AssemblyTitle>Lysma</AssemblyTitle>
+    <Description>Lysma - estação de limpeza de memória</Description>
+    <Version>1.2.0</Version>
+    <!-- Gera Lysma.exe: dotnet publish -c Release -r win-x64 -o C:\Apps\Lysma -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- mesmo ícone embutido para a janela e a bandeja -->
+    <EmbeddedResource Include="lysma.ico" LogicalName="Lysma.lysma.ico" />
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace RamCleaner;
+namespace Lysma;
 
 /// <summary>Estado/estatística de um app monitorado (atualizado a cada leitura/limpeza).</summary>
 public class AppStats

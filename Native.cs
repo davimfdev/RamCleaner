@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace RamCleaner;
+namespace Lysma;
 
 /// <summary>Chamadas diretas à API do Windows.</summary>
 internal static class Native

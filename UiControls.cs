@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 
-namespace RamCleaner;
+namespace Lysma;
 
 // Controles desenhados à mão (GDI+). Só repintam quando algo muda: nenhum timer, nenhuma animação.
 
@@ -430,5 +430,189 @@ internal static class GridStyle
             g.Clip = old;
         }
         e.Handled = true;
+    }
+}
+
+/// <summary>Barra com itens à esquerda e à direita, todos centralizados na vertical (layout manual, sem TableLayout).</summary>
+internal class ToolbarPanel : Panel
+{
+    private readonly List<Control> _left = new(), _right = new();
+    public int Gap { get; set; } = 8;
+    public int RightGap { get; set; } = 14;
+
+    public void AddLeft(params Control[] items) { _left.AddRange(items); Controls.AddRange(items); PerformLayout(); }
+    public void AddRight(params Control[] items) { _right.AddRange(items); Controls.AddRange(items); PerformLayout(); }
+
+    protected override void OnLayout(LayoutEventArgs e)
+    {
+        base.OnLayout(e);
+        int x = Padding.Left;
+        foreach (var c in _left)
+        {
+            c.Location = new Point(x, (Height - c.Height) / 2);
+            x += c.Width + Gap;
+        }
+        int rx = Width - Padding.Right;
+        for (int i = _right.Count - 1; i >= 0; i--)
+        {
+            var c = _right[i];
+            rx -= c.Width;
+            c.Location = new Point(rx, (Height - c.Height) / 2);
+            rx -= i > 0 && _right[i - 1] is EyebrowLabel ? 8 : RightGap; // rótulo fica colado no campo
+        }
+    }
+}
+
+/// <summary>
+/// DataGridView sem as barras de rolagem nativas (que ficam brancas/fora do tema).
+/// A rolagem é feita pela roda do mouse e pelo <see cref="ThinScrollBar"/>.
+/// </summary>
+internal class ThemedGrid : DataGridView
+{
+    public event EventHandler? ViewChanged;
+    private (int first, int count, int visible) _last = (-1, -1, -1);
+
+    public ThemedGrid() { ScrollBars = ScrollBars.None; }
+
+    public int FirstRow => Rows.Count == 0 ? 0 : Math.Max(0, FirstDisplayedScrollingRowIndex);
+    public int VisibleRows => Math.Max(1, (ClientSize.Height - (ColumnHeadersVisible ? ColumnHeadersHeight : 0)) / Math.Max(1, RowTemplate.Height));
+    public int MaxFirst => Math.Max(0, Rows.Count - VisibleRows);
+
+    public void ScrollTo(int first)
+    {
+        if (Rows.Count == 0) return;
+        first = Math.Clamp(first, 0, MaxFirst);
+        if (first != FirstRow)
+        {
+            try { FirstDisplayedScrollingRowIndex = first; } catch { }
+        }
+        RaiseIfChanged();
+    }
+
+    protected override void OnMouseWheel(MouseEventArgs e)
+    {
+        int step = Math.Max(1, SystemInformation.MouseWheelScrollLines);
+        ScrollTo(FirstRow - Math.Sign(e.Delta) * step);
+        if (e is HandledMouseEventArgs h) h.Handled = true;
+    }
+
+    protected override void OnSizeChanged(EventArgs e)
+    {
+        base.OnSizeChanged(e);
+        ScrollTo(FirstRow); // ao aumentar a janela, não deixa espaço vazio embaixo
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+        RaiseIfChanged(); // pega rolagem por teclado, linhas novas etc.
+    }
+
+    private void RaiseIfChanged()
+    {
+        var now = (FirstRow, Rows.Count, VisibleRows);
+        if (now == _last) return;
+        _last = now;
+        ViewChanged?.Invoke(this, EventArgs.Empty);
+    }
+}
+
+/// <summary>Barra de rolagem fina no estilo do app: sem setas, thumb arredondado que engrossa no hover.</summary>
+internal class ThinScrollBar : Control
+{
+    private ThemedGrid? _grid;
+    private bool _hover, _drag;
+    private int _dragOffset;
+
+    public ThinScrollBar()
+    {
+        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer |
+                 ControlStyles.ResizeRedraw | ControlStyles.UserPaint, true);
+        Width = 14;
+        Margin = new Padding(0);
+    }
+
+    public void Attach(ThemedGrid grid)
+    {
+        _grid = grid;
+        grid.ViewChanged += (_, _) => Invalidate();
+    }
+
+    private int TrackTop => (_grid?.ColumnHeadersVisible == true ? _grid.ColumnHeadersHeight : 0) + 4;
+    private int TrackHeight => Math.Max(0, Height - TrackTop - 4);
+
+    private Rectangle Thumb()
+    {
+        if (_grid == null || _grid.MaxFirst == 0 || TrackHeight < 20) return Rectangle.Empty;
+        int total = _grid.Rows.Count, visible = _grid.VisibleRows;
+        int h = Math.Max(28, TrackHeight * visible / Math.Max(1, total));
+        int y = TrackTop + (int)((TrackHeight - h) * (_grid.FirstRow / (double)_grid.MaxFirst));
+        return new Rectangle(0, y, Width, h);
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        var g = e.Graphics;
+        var bg = Parent?.BackColor ?? Theme.Surface1;
+        g.Clear(bg);
+        var t = Thumb();
+        if (t.IsEmpty) return;
+
+        // trilho discreto
+        int tw = 4;
+        Theme.FillRound(g, new RectangleF((Width - tw) / 2f, TrackTop, tw, TrackHeight), tw / 2f, Theme.Mix(Theme.Fg, bg, 0.04));
+
+        // thumb
+        int w = _hover || _drag ? 8 : 4;
+        var color = _drag ? Theme.FgSoft : _hover ? Theme.FgMuted : Theme.LineStrong;
+        if (!_hover && !_drag && !Theme.IsDark) color = Theme.Mix(Theme.Fg, bg, 0.25);
+        Theme.FillRound(g, new RectangleF((Width - w) / 2f, t.Y, w, t.Height), w / 2f, color);
+    }
+
+    protected override void OnMouseEnter(EventArgs e) { _hover = true; Invalidate(); base.OnMouseEnter(e); }
+    protected override void OnMouseLeave(EventArgs e) { _hover = false; Invalidate(); base.OnMouseLeave(e); }
+
+    protected override void OnMouseDown(MouseEventArgs e)
+    {
+        base.OnMouseDown(e);
+        if (_grid == null || e.Button != MouseButtons.Left) return;
+        var t = Thumb();
+        if (t.IsEmpty) return;
+        if (e.Y >= t.Top && e.Y <= t.Bottom)
+        {
+            _drag = true;
+            _dragOffset = e.Y - t.Top;
+        }
+        else
+        {
+            // clique no trilho: pula uma página
+            _grid.ScrollTo(_grid.FirstRow + (e.Y < t.Top ? -_grid.VisibleRows : _grid.VisibleRows));
+        }
+        Invalidate();
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+        if (!_drag || _grid == null) return;
+        var t = Thumb();
+        int range = TrackHeight - t.Height;
+        if (range <= 0) return;
+        double frac = (e.Y - _dragOffset - TrackTop) / (double)range;
+        _grid.ScrollTo((int)Math.Round(Math.Clamp(frac, 0, 1) * _grid.MaxFirst));
+    }
+
+    protected override void OnMouseUp(MouseEventArgs e)
+    {
+        base.OnMouseUp(e);
+        _drag = false;
+        Invalidate();
+    }
+
+    protected override void OnMouseWheel(MouseEventArgs e)
+    {
+        base.OnMouseWheel(e);
+        if (_grid == null) return;
+        _grid.ScrollTo(_grid.FirstRow - Math.Sign(e.Delta) * Math.Max(1, SystemInformation.MouseWheelScrollLines));
     }
 }

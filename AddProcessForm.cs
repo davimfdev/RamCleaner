@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace RamCleaner;
+namespace Lysma;
 
 /// <summary>
 /// Janela para criar ou editar um app monitorado.
@@ -10,7 +10,8 @@ namespace RamCleaner;
 /// </summary>
 internal class AddProcessForm : Form
 {
-    private readonly DataGridView _grid = new();
+    private readonly ThemedGrid _grid = new();
+    private readonly ThinScrollBar _scroll = new();
     private readonly FieldBox _search = new("Buscar processo aberto...");
     private readonly FieldBox _name;
     private readonly FieldBox _threshold = new("0", "MB", numeric: true);
@@ -37,6 +38,7 @@ internal class AddProcessForm : Form
         BackColor = Theme.Bg;
         ForeColor = Theme.Fg;
         ShowInTaskbar = false;
+        Icon = AppIcon.Window;
         MinimizeBox = false;
 
         _name = new FieldBox(_editMode ? "ex.: Edge" : "Opcional: ex.: Edge (junta os marcados num grupo só)");
@@ -137,7 +139,10 @@ internal class AddProcessForm : Form
         };
         _grid.DataError += (_, e) => e.ThrowException = false;
 
+        _scroll.Dock = DockStyle.Right;
+        _scroll.Attach(_grid);
         surface.Controls.Add(_grid);
+        surface.Controls.Add(_scroll);
         return surface;
     }
 

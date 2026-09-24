@@ -1,4 +1,4 @@
-namespace RamCleaner;
+namespace Lysma;
 
 internal static class Program
 {
@@ -6,10 +6,10 @@ internal static class Program
     private static void Main(string[] args)
     {
         // Só uma instância por usuário.
-        using var mutex = new Mutex(true, @"Local\RamCleaner_SingleInstance", out bool isNew);
+        using var mutex = new Mutex(true, @"Local\Lysma_SingleInstance", out bool isNew);
         if (!isNew)
         {
-            MessageBox.Show("O RamCleaner já está rodando (veja o ícone perto do relógio).", "RamCleaner",
+            MessageBox.Show("O Lysma já está rodando (veja o ícone perto do relógio).", "Lysma",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }

@@ -1,0 +1,15 @@
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\Lysma.exe
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\Lysma.deps.json
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\Lysma.runtimeconfig.json
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\Lysma.dll
+C:\Users\davi\Documents\Projetos\RamCleaner\bin\Release\net8.0-windows\Lysma.pdb
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\Lysma.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\Lysma.AssemblyInfoInputs.cache
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\Lysma.AssemblyInfo.cs
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\Lysma.csproj.CoreCompileInputs.cache
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\Lysma.sourcelink.json
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\Lysma.dll
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\refint\Lysma.dll
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\Lysma.pdb
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\Lysma.genruntimeconfig.cache
+C:\Users\davi\Documents\Projetos\RamCleaner\obj\Release\net8.0-windows\ref\Lysma.dll

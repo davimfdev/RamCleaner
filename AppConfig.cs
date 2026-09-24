@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace RamCleaner;
+namespace Lysma;
 
 /// <summary>
 /// Um "app" monitorado: um nome que você escolhe (ex.: "Edge") com um ou mais
@@ -51,14 +51,24 @@ public class AppConfig
     private static readonly JsonSerializerOptions JsonOpts = new() { WriteIndented = true };
 
     public static string ConfigDir =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "RamCleaner");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Lysma");
 
     public static string ConfigPath => Path.Combine(ConfigDir, "config.json");
+
+    /// <summary>Pasta usada quando o app se chamava RamCleaner.</summary>
+    private static string LegacyConfigPath =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "RamCleaner", "config.json");
 
     public static AppConfig Load()
     {
         try
         {
+            // Primeira vez como Lysma: traz a config do RamCleaner.
+            if (!File.Exists(ConfigPath) && File.Exists(LegacyConfigPath))
+            {
+                Directory.CreateDirectory(ConfigDir);
+                File.Copy(LegacyConfigPath, ConfigPath);
+            }
             if (File.Exists(ConfigPath))
             {
                 var cfg = JsonSerializer.Deserialize<AppConfig>(File.ReadAllText(ConfigPath));
